@@ -176,9 +176,24 @@ class ObjectExplorer(Explorer):
             file.close()
         self.__rootPouDom=BeautifulSoup(content,"xml")
     def catchPouText(self):
+        text=""
         textDocuments=self.__rootPouDom.find_all("Single",{"Name":"TextDocument"})
+        textDocuments.reverse()
         for textDocument in textDocuments:
-    def findText(self,elementLevel1:bs4.Tag):
+            text=text+self.findPouText(textDocument)
+
+        with open("C://parse//output.txt", "w") as file:
+            file.write(text)
+            file.close()
+    def findPouText(self,rootElement:bs4.Tag):
+        pou_text=""
+        for elementLevel1 in [item for item in rootElement.children if item.name is not None]:
+            for elementLevel2 in [item for item in elementLevel1.children if item.name is not None]:
+                for elementLevel3 in [item for item in elementLevel2.children if item.name is not None]:
+                    if elementLevel3["Name"]=="Text":
+                        pou_text=pou_text+elementLevel3.text+"\n"
+        return  pou_text
+
     def explorePou(self):
         for elementLevel1 in [item for item in self.__rootPouDom.children if item.name is not None]:
             print(f"{Fore.RED}{elementLevel1.name}")
@@ -225,7 +240,7 @@ class ObjectExplorer(Explorer):
                             print(f"{elementLevel4.attrs}")
                         if elementLevel4["Name"]=="Text":
                             print(f"{Fore.LIGHTWHITE_EX}{elementLevel4.text}")
-                            with open("C://parse//ARCH_AND_RETAIN_source.txt",mode="a+") as file:
+                            with open("C://parse//POUS//ARCH_AND_RETAIN.xml",mode="a+") as file:
                                 file.write(elementLevel4.text+"\n")
                                 file.close()
     def exploreObjectSection(self):
