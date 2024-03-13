@@ -114,7 +114,7 @@ class ObjectExplorer(Explorer):
     def __dropFolder(self,path:str):
         if exists(path):
             rmtree(path)
-            mkdir(path)
+        mkdir(path)
     #Метод извлечения POU объектов из экпортного файла и сохранения clear-файла(файл содержащий stub-болванки для POU)
     #Данный файл служит для восстановления экспортного файла
     def cutPous(self):
@@ -169,6 +169,14 @@ class ObjectExplorer(Explorer):
             content=file.read()
             file.close()
         return BeautifulSoup(content,"xml")
+    def saveTexts(self):
+        if exists(f"C://parse//sources"):
+            rmtree("C://parse//sources")
+        mkdir("C://parse//sources")
+        for filename in listdir("C://parse//POUS"):
+            self._PouName=filename
+            self.createPouDom(f"C://parse//POUS//{filename}")
+            self.catchPouText()
 
     def createPouDom(self,path:str):
         with open(path,mode="r",encoding="utf8") as file:
@@ -182,7 +190,7 @@ class ObjectExplorer(Explorer):
         for textDocument in textDocuments:
             text=text+self.findPouText(textDocument)
 
-        with open("C://parse//output.txt", "w") as file:
+        with open(f"C://parse//sources//{self._PouName}", "w") as file:
             file.write(text)
             file.close()
     def findPouText(self,rootElement:bs4.Tag):
